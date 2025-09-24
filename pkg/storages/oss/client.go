@@ -8,6 +8,7 @@ import (
 	"github.com/aliyun/alibabacloud-oss-go-sdk-v2/oss"
 	osscred "github.com/aliyun/alibabacloud-oss-go-sdk-v2/oss/credentials"
 	"github.com/aliyun/alibabacloud-oss-go-sdk-v2/oss/retry"
+	"github.com/aliyun/alibabacloud-oss-go-sdk-v2/oss/transport"
 	"github.com/aliyun/credentials-go/credentials/providers"
 )
 
@@ -84,6 +85,7 @@ func configureClient(config *Config) (*oss.Client, error) {
 		return nil, fmt.Errorf("create credentials: %w", err)
 	}
 
+	keepAlive := time.Duration(config.KeepAliveTimeout) * time.Second
 	ossConfig := oss.LoadDefaultConfig().
 		WithRegion(config.Region).
 		WithCredentialsProvider(cred).
@@ -92,7 +94,10 @@ func configureClient(config *Config) (*oss.Client, error) {
 		WithRetryer(retry.NewStandard(func(ro *retry.RetryOptions) {
 			ro.MaxAttempts = config.MaxRetries
 		})).
-		WithConnectTimeout(time.Duration(config.ConnectTimeout) * time.Second)
+		WithConnectTimeout(time.Duration(config.ConnectTimeout) * time.Second).
+		WithHttpClient(transport.NewHttpClient(&transport.Config{
+			KeepAliveTimeout: &keepAlive,
+		}))
 
 	if config.Endpoint != "" {
 		ossConfig = ossConfig.WithEndpoint(config.Endpoint)

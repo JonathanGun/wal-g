@@ -12,18 +12,19 @@ import (
 const (
 	// using OSS_ prefix since alicloud credentials package
 	// is following the same convention
-	accessKeyIDSetting     = "OSS_ACCESS_KEY_ID"
-	accessKeySecretSetting = "OSS_ACCESS_KEY_SECRET"
-	securityTokenSetting   = "OSS_SESSION_TOKEN"
-	endpointSetting        = "OSS_ENDPOINT"
-	regionSetting          = "OSS_REGION"
-	roleARNSetting         = "OSS_ROLE_ARN"
-	roleSessionNameSetting = "OSS_ROLE_SESSION_NAME"
-	skipValidationSetting  = "OSS_SKIP_VALIDATION"
-	maxRetriesSetting      = "OSS_MAX_RETRIES"
-	connectTimeoutSetting  = "OSS_CONNECT_TIMEOUT"
-	uploadPartSizeSetting  = "OSS_UPLOAD_PART_SIZE"
-	copyPartSizeSetting    = "OSS_COPY_PART_SIZE"
+	accessKeyIDSetting      = "OSS_ACCESS_KEY_ID"
+	accessKeySecretSetting  = "OSS_ACCESS_KEY_SECRET"
+	securityTokenSetting    = "OSS_SESSION_TOKEN"
+	endpointSetting         = "OSS_ENDPOINT"
+	regionSetting           = "OSS_REGION"
+	roleARNSetting          = "OSS_ROLE_ARN"
+	roleSessionNameSetting  = "OSS_ROLE_SESSION_NAME"
+	skipValidationSetting   = "OSS_SKIP_VALIDATION"
+	maxRetriesSetting       = "OSS_MAX_RETRIES"
+	connectTimeoutSetting   = "OSS_CONNECT_TIMEOUT"
+	keepAliveTimeoutSetting = "OSS_KEEPALIVE_TIMEOUT"
+	uploadPartSizeSetting   = "OSS_UPLOAD_PART_SIZE"
+	copyPartSizeSetting     = "OSS_COPY_PART_SIZE"
 )
 
 var SettingList = []string{
@@ -73,6 +74,11 @@ func ConfigureStorage(
 		return nil, err
 	}
 
+	keepAliveTimeout, err := setting.Int64Optional(settings, keepAliveTimeoutSetting, defaultConnectTimeoutSeconds)
+	if err != nil {
+		return nil, err
+	}
+
 	uploadPartSize, err := setting.Int64Optional(settings, uploadPartSizeSetting, oss.DefaultUploadPartSize)
 	if err != nil {
 		return nil, err
@@ -84,20 +90,21 @@ func ConfigureStorage(
 	}
 
 	config := &Config{
-		AccessKeyID:     strings.TrimSpace(settings[accessKeyIDSetting]),
-		AccessKeySecret: strings.TrimSpace(settings[accessKeySecretSetting]),
-		SecurityToken:   strings.TrimSpace(settings[securityTokenSetting]),
-		RoleARN:         strings.TrimSpace(settings[roleARNSetting]),
-		RoleSessionName: strings.TrimSpace(settings[roleSessionNameSetting]),
-		Endpoint:        strings.TrimSpace(settings[endpointSetting]),
-		Bucket:          bucket,
-		RootPath:        rootPath,
-		SkipValidation:  skipValidation,
-		MaxRetries:      maxRetries,
-		Region:          settings[regionSetting],
-		ConnectTimeout:  connectTimeout,
-		UploadPartSize:  uploadPartSize,
-		CopyPartSize:    copyPartSize,
+		AccessKeyID:      strings.TrimSpace(settings[accessKeyIDSetting]),
+		AccessKeySecret:  strings.TrimSpace(settings[accessKeySecretSetting]),
+		SecurityToken:    strings.TrimSpace(settings[securityTokenSetting]),
+		RoleARN:          strings.TrimSpace(settings[roleARNSetting]),
+		RoleSessionName:  strings.TrimSpace(settings[roleSessionNameSetting]),
+		Endpoint:         strings.TrimSpace(settings[endpointSetting]),
+		Bucket:           bucket,
+		RootPath:         rootPath,
+		SkipValidation:   skipValidation,
+		MaxRetries:       maxRetries,
+		Region:           settings[regionSetting],
+		ConnectTimeout:   connectTimeout,
+		KeepAliveTimeout: keepAliveTimeout,
+		UploadPartSize:   uploadPartSize,
+		CopyPartSize:     copyPartSize,
 	}
 
 	st, err := NewStorage(config, rootWraps...)

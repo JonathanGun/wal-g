@@ -27,6 +27,7 @@ type Config struct {
 	MaxRetries       int
 	EnableVersioning string
 	ConnectTimeout   int64
+	KeepAliveTimeout int64
 	UploadPartSize   int64
 	CopyPartSize     int64
 }
