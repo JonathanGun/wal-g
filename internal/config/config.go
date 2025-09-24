@@ -473,6 +473,7 @@ var (
 		"OSS_MAX_RETRIES":       true,
 		"OSS_CONNECT_TIMEOUT":   true,
 		"OSS_UPLOAD_PART_SIZE":  true,
+		"OSS_KEEPALIVE_TIMEOUT": true,
 		"OSS_COPY_PART_SIZE":    true,
 
 		// Yandex Cloud
