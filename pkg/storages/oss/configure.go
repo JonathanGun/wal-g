@@ -43,10 +43,11 @@ var SettingList = []string{
 }
 
 const (
-	defaultSkipValidation        = false
-	defaultMaxRetries            = 5
-	defaultLogLevel              = "info"
-	defaultConnectTimeoutSeconds = 5
+	defaultSkipValidation          = false
+	defaultMaxRetries              = 5
+	defaultLogLevel                = "info"
+	defaultConnectTimeoutSeconds   = 5
+	defaultKeepAliveTimeoutSeconds = 30
 )
 
 func ConfigureStorage(
@@ -74,7 +75,7 @@ func ConfigureStorage(
 		return nil, err
 	}
 
-	keepAliveTimeout, err := setting.Int64Optional(settings, keepAliveTimeoutSetting, defaultConnectTimeoutSeconds)
+	keepAliveTimeout, err := setting.Int64Optional(settings, keepAliveTimeoutSetting, defaultKeepAliveTimeoutSeconds)
 	if err != nil {
 		return nil, err
 	}
